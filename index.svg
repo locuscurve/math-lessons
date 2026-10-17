@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xhtml="http://www.w3.org/1999/xhtml"
+     width="100vw"
+     height="100vh"
+     style="display:block;overflow:hidden;background:#050607">
+  <title>Lemniscate</title>
+  <foreignObject x="0" y="0" width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml"
+         style="display:block;width:100vw;height:100vh;margin:0;overflow:hidden">
+      <iframe
+        title="Lemniscate website"
+        src="https://locuscurve.github.io/math-lessons/"
+        style="display:block;width:100vw;height:100vh;border:0;background:#050607"
+        allow="fullscreen; autoplay; clipboard-read; clipboard-write"
+        referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
+  </foreignObject>
+</svg>
