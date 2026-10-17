@@ -1,0 +1,247 @@
+/* Lemniscate chat — plain CSS so no Tailwind rebuild is needed. */
+.lc { --bg:#07090b; --panel:#0b0e11; --panel2:#10151a; --line:rgba(255,255,255,.07); --text:#e4e4e7; --dim:#8b8f99;
+  --accent:#7dff8a; --accent-ink:#06210b; --cyan:#7ee8ff; --danger:#ff6b81;
+  font-family: Inter, system-ui, sans-serif; color: var(--text); }
+.lc { --foot-h: 4rem; }
+.lc * { box-sizing: border-box; }
+.lc [hidden] { display:none !important; }
+:where(.lc) button { font: inherit; color: inherit; cursor: pointer; }
+:where(.lc) input, :where(.lc) textarea { font: inherit; color: inherit; }
+
+/* ---------- auth ---------- */
+.lc-auth { display:flex; align-items:center; justify-content:center; min-height: calc(100vh - 12rem); padding: 1rem; }
+.lc-auth-card { width:100%; max-width:320px; text-align:left; }
+.lc-auth-card.center { text-align:center; }
+.lc-auth-card h2 { font-family: Inter, system-ui, sans-serif; font-size:1rem; font-weight:700; margin:0 0 .25rem; color:#fff; letter-spacing:0; }
+.lc-auth-card .sub { color:var(--dim); font-size:.74rem; margin:0 0 1.1rem; }
+.lc-field { display:flex; align-items:center; gap:.55rem; height:34px; margin-bottom:.5rem; padding:0 .75rem;
+  background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:8px; transition:border-color .15s; }
+.lc-field:focus-within { border-color: rgba(125,255,138,.55); }
+.lc-field svg { width:13px; height:13px; color:var(--accent); opacity:.7; flex-shrink:0; }
+.lc-field input:focus-visible, .lc-inputrow textarea:focus-visible { outline:none; }
+.lc-field input { flex:1; min-width:0; background:none; border:0; outline:0; font-size:.76rem; }
+.lc-field input::placeholder { color:#5d616b; }
+.lc-forgot { text-align:right; margin:-.1rem 0 .55rem; }
+.lc-forgot button { background:none; border:0; padding:0; font-size:.68rem; color:var(--dim); }
+.lc-forgot button:hover { color:var(--accent); }
+.lc-btn { width:100%; height:34px; border:0; border-radius:8px; background:var(--accent); color:var(--accent-ink);
+  font-weight:600; font-size:.78rem; margin-top:.2rem; transition:filter .15s, transform .05s; }
+.lc-btn:hover { filter:brightness(1.08); } .lc-btn:active { transform:translateY(1px); } .lc-btn:disabled { opacity:.55; cursor:default; }
+.lc-btn.ghost { background:rgba(255,255,255,.06); color:var(--text); }
+.lc-btn.small { width:auto; height:30px; padding:0 .8rem; font-size:.72rem; margin:0; }
+.lc-err { margin:.1rem 0 .5rem; padding:.4rem .6rem; border-radius:8px; font-size:.7rem; color:#ffd0d6;
+  background:rgba(255,107,129,.1); border:1px solid rgba(255,107,129,.3); }
+.lc-switch { margin-top:.9rem; font-size:.72rem; color:var(--dim); text-align:center; }
+.lc-switch button { font-size:inherit; font-weight:600; }
+.lc-switch.back { margin-top:1rem; }
+.lc-switch.back button { font-weight:400; color:var(--dim); }
+.lc-switch.back button:hover { color:var(--accent); text-decoration:none; }
+.lc-legal { margin:1rem 0 0; font-size:.64rem; line-height:1.5; color:var(--dim); text-align:center; }
+.lc-legal a { color:var(--accent); text-decoration:none; border-bottom:1px dashed rgba(125,255,138,.5); padding-bottom:1px; }
+.lc-legal a:hover { border-bottom-style:solid; }
+.lc-switch button { background:none; border:0; padding:0; color:var(--accent); }
+.lc-switch button:hover { text-decoration:underline; }
+
+/* ---------- layout ---------- */
+.lc-app { display:grid; grid-template-columns: 240px minmax(0,1fr) 220px; height: calc(100vh - 11.5rem); min-height:460px;
+  background:var(--bg); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+.lc-side, .lc-members { background:var(--panel); display:flex; flex-direction:column; min-height:0; }
+.lc-side { border-right:1px solid var(--line); }
+.lc-members { border-left:1px solid var(--line); }
+.lc-side-head { padding:.9rem 1rem; font-family:Orbitron,system-ui,sans-serif; font-size:.85rem; letter-spacing:.08em; border-bottom:1px solid var(--line); color:#fff; }
+.lc-scroll { overflow-y:auto; min-height:0; flex:1; scrollbar-width:thin; scrollbar-color:#23292f transparent; }
+.lc-cat { padding:.9rem 1rem .3rem; font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:#5d616b; font-weight:600; }
+.lc-chan { display:flex; align-items:center; gap:.5rem; width:calc(100% - .8rem); margin:1px .4rem; padding:.42rem .65rem; border:0; border-radius:8px;
+  background:none; text-align:left; color:var(--dim); font-size:.9rem; }
+.lc-chan:hover { background:rgba(255,255,255,.04); color:var(--text); }
+.lc-chan.active { background:rgba(125,255,138,.09); color:#fff; }
+.lc-chan .hash { color:#5d616b; } .lc-chan.active .hash { color:var(--accent); }
+.lc-chan.unread { color:#fff; font-weight:600; }
+.lc-chan .dot { margin-left:auto; width:7px; height:7px; border-radius:50%; background:var(--accent); display:none; }
+.lc-chan.unread .dot { display:block; }
+.lc-userbar { display:flex; align-items:center; gap:.6rem; height:var(--foot-h); flex-shrink:0; padding:0 .75rem; border-top:1px solid var(--line); background:rgba(0,0,0,.25); }
+.lc-userbar .who { flex:1; min-width:0; text-align:left; background:none; border:0; padding:0; display:flex; align-items:center; gap:.55rem; }
+.lc-userbar .name { font-size:.85rem; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.lc-iconbtn { width:30px; height:30px; display:grid; place-items:center; border:0; border-radius:8px; background:none; color:var(--dim); }
+.lc-iconbtn:hover { background:rgba(255,255,255,.07); color:#fff; }
+.lc-iconbtn svg { width:16px; height:16px; }
+
+.lc-avatar { position:relative; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; flex-shrink:0;
+  font-weight:700; font-size:.85rem; color:#06100a; user-select:none; }
+.lc-avatar.sm { width:28px; height:28px; font-size:.72rem; }
+.lc-avatar.lg { width:72px; height:72px; font-size:1.7rem; }
+.lc-avatar img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:50%; pointer-events:none; }
+.lc-avatar .st { position:absolute; right:-1px; bottom:-1px; width:10px; height:10px; border-radius:50%; background:#3b4047; border:2px solid var(--panel); }
+.lc-avatar .st.on { background:var(--accent); }
+
+/* ---------- main ---------- */
+.lc-main { display:flex; flex-direction:column; min-width:0; min-height:0; background:var(--bg); }
+.lc-main-head { display:flex; align-items:center; gap:.6rem; padding:.8rem 1.1rem; border-bottom:1px solid var(--line); font-weight:600; }
+.lc-main-head .hash { color:var(--accent); }
+.lc-msgs { flex:1; overflow-y:auto; padding:.6rem 0 .4rem; min-height:0; scrollbar-width:thin; scrollbar-color:#23292f transparent; }
+.lc-empty { height:100%; display:grid; place-items:center; color:var(--dim); font-size:.9rem; }
+.lc-more { display:block; margin:.4rem auto .8rem; padding:.35rem .9rem; border-radius:999px; border:1px solid var(--line); background:none; color:var(--dim); font-size:.78rem; }
+.lc-day { display:flex; align-items:center; gap:.8rem; margin:.9rem 1.1rem .4rem; color:#5d616b; font-size:.7rem; letter-spacing:.06em; }
+.lc-day::before, .lc-day::after { content:""; flex:1; height:1px; background:var(--line); }
+.lc-msg { position:relative; display:flex; gap:.8rem; padding:.18rem 1.1rem; }
+.lc-msg:hover { background:rgba(255,255,255,.025); }
+.lc-msg.first { margin-top:.65rem; }
+.lc-gutter { width:34px; flex-shrink:0; font-size:.62rem; color:transparent; text-align:center; padding-top:.35rem; }
+.lc-msg:hover .lc-gutter { color:#5d616b; }
+.lc-body { min-width:0; flex:1; }
+.lc-meta { display:flex; align-items:baseline; flex-wrap:wrap; gap:.45rem; }
+.lc-name { background:none; border:0; padding:0; font-weight:600; font-size:.92rem; }
+.lc-name:hover { text-decoration:underline; }
+.lc-time { font-size:.68rem; color:#5d616b; }
+.lc-badge { font-size:.6rem; font-weight:700; letter-spacing:.06em; padding:1px 6px; border-radius:5px; text-transform:uppercase; }
+.lc-badge.owner { background:rgba(255,210,126,.15); color:#ffd27e; }
+.lc-badge.admin { background:rgba(255,126,182,.15); color:#ff7eb6; }
+.lc-badge.mod { background:rgba(126,232,255,.15); color:var(--cyan); }
+.lc-text { font-size:.92rem; line-height:1.45; white-space:pre-wrap; overflow-wrap:anywhere; color:#d4d4d8; }
+.lc-text a { color:var(--cyan); text-decoration:none; } .lc-text a:hover { text-decoration:underline; }
+.lc-replyref { display:flex; align-items:center; gap:.4rem; margin-bottom:.15rem; font-size:.75rem; color:var(--dim); overflow:hidden; white-space:nowrap; }
+.lc-replyref b { font-weight:600; } .lc-replyref span { overflow:hidden; text-overflow:ellipsis; }
+.lc-reacts { display:flex; flex-wrap:wrap; gap:.3rem; margin-top:.3rem; }
+.lc-react { display:inline-flex; align-items:center; gap:.3rem; padding:1px 8px; border-radius:999px; font-size:.78rem;
+  background:rgba(255,255,255,.05); border:1px solid transparent; }
+.lc-react:hover { border-color:rgba(255,255,255,.2); }
+.lc-react.mine { background:rgba(125,255,138,.12); border-color:rgba(125,255,138,.45); }
+.lc-tools { position:absolute; right:1rem; top:-14px; display:none; gap:2px; padding:2px; background:var(--panel2); border:1px solid var(--line); border-radius:9px; z-index:2; }
+.lc-msg:hover .lc-tools, .lc-msg:focus-within .lc-tools { display:flex; }
+.lc-tools button { width:28px; height:26px; border:0; border-radius:6px; background:none; font-size:.8rem; color:var(--dim); }
+.lc-tools button:hover { background:rgba(255,255,255,.08); color:#fff; }
+.lc-tools button.del:hover { color:var(--danger); }
+.lc-picker { position:absolute; right:1rem; top:16px; display:flex; gap:2px; padding:4px; background:var(--panel2); border:1px solid var(--line); border-radius:10px; z-index:5; }
+.lc-picker button { width:30px; height:30px; border:0; background:none; border-radius:6px; font-size:1rem; }
+.lc-picker button:hover { background:rgba(255,255,255,.08); }
+
+/* Same height as the user bar on the left, with the message box centered in it, so the two line up. */
+.lc-compose { min-height:var(--foot-h); padding:.35rem 1.1rem; display:flex; flex-direction:column; justify-content:center; }
+.lc-replybar { display:flex; align-items:center; gap:.5rem; padding:.4rem .8rem; margin-bottom:-6px; border-radius:10px 10px 0 0; background:var(--panel2); border:1px solid var(--line); border-bottom:0; font-size:.78rem; color:var(--dim); }
+.lc-replybar span { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.lc-inputrow { display:flex; align-items:flex-end; gap:.5rem; padding:.45rem .5rem .45rem .9rem; background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:12px; }
+.lc-inputrow:focus-within { border-color:rgba(125,255,138,.45); }
+.lc-inputrow textarea { flex:1; resize:none; max-height:140px; min-height:24px; padding:.3rem 0; background:none; border:0; outline:0; font-size:.92rem; line-height:1.4; }
+.lc-inputrow textarea::placeholder { color:#5d616b; }
+.lc-inputrow textarea:disabled { cursor:not-allowed; }
+.lc-send { width:34px; height:34px; border:0; border-radius:9px; background:var(--accent); color:var(--accent-ink); display:grid; place-items:center; }
+.lc-send:disabled { opacity:.35; cursor:default; } .lc-send svg { width:16px; height:16px; }
+.lc-typing { height:18px; padding:0 1.1rem; font-size:.74rem; color:var(--dim); }
+.lc-status { padding:.3rem 1.1rem; font-size:.75rem; background:rgba(255,107,129,.12); color:#ffd0d6; }
+
+/* ---------- members ---------- */
+.lc-mhead { padding:.9rem 1rem .4rem; font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:#5d616b; font-weight:600; }
+.lc-member { display:flex; align-items:center; gap:.6rem; width:calc(100% - .8rem); margin:1px .4rem; padding:.35rem .5rem; border:0; border-radius:8px; background:none; text-align:left; }
+.lc-member:hover { background:rgba(255,255,255,.05); }
+.lc-member.off { opacity:.45; }
+.lc-member .nm { font-size:.86rem; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* ---------- profile modal ---------- */
+.lc-overlay { position:fixed; inset:0; z-index:60; display:grid; place-items:center; padding:1rem; background:rgba(0,0,0,.7); backdrop-filter:blur(4px); }
+.lc-card { width:100%; max-width:340px; max-height:calc(100vh - 2rem); overflow-x:hidden; overflow-y:auto; border-radius:16px; background:var(--panel2); border:1px solid var(--line); }
+.lc-card-banner { height:84px; background-size:cover; background-position:center; }
+.lc-card-body { padding:0 1.2rem 1.2rem; }
+.lc-card .lc-avatar.lg { margin-top:-36px; border:0; }
+.lc-card h3 { margin:.6rem 0 .1rem; font-size:1.15rem; display:flex; align-items:center; gap:.5rem; }
+.lc-card .meta { font-size:.75rem; color:var(--dim); margin:0 0 .8rem; }
+.lc-card .bio { font-size:.88rem; line-height:1.45; padding:.7rem .8rem; border-radius:10px; background:rgba(0,0,0,.25); white-space:pre-wrap; overflow-wrap:anywhere; }
+.lc-card .row { display:flex; gap:.5rem; margin-top:.9rem; }
+.lc-card textarea { width:100%; min-height:72px; resize:vertical; padding:.6rem .7rem; border-radius:10px; background:rgba(0,0,0,.25); border:1px solid var(--line); outline:0; font-size:.88rem; }
+.lc-colors { display:flex; gap:.4rem; margin-top:.7rem; }
+.lc-colors button { width:24px; height:24px; border-radius:50%; border:2px solid transparent; }
+.lc-colors button.sel { border-color:#fff; }
+
+/* ---------- small screens ---------- */
+@media (max-width: 900px) { .lc-app { grid-template-columns: 200px minmax(0,1fr); } .lc-members { display:none; } }
+@media (max-width: 640px) {
+  .lc-app { grid-template-columns: minmax(0,1fr); height: calc(100vh - 10rem); }
+  .lc-side { display:none; } .lc-app.show-side .lc-side { display:flex; position:absolute; inset:0; z-index:10; border-right:0; }
+  .lc-app { position:relative; } .lc-burger { display:grid !important; }
+}
+.lc-burger { display:none !important; }
+
+/* ---------- full-screen chat ---------- */
+/* app.js adds .chat-mode to <html> while the Chat tab is open and sets --dock-h to the bottom nav's height. */
+html.chat-mode, html.chat-mode body { overflow: hidden; }
+html.chat-mode #hdr { display: none; }
+html.chat-mode #workspace { padding-bottom: 0; }
+html.chat-mode #view { padding: 0; }
+html.chat-mode #view > div { max-width: none; }
+html.chat-mode .lc { position: fixed; top: 0; left: 0; right: 0; bottom: var(--dock-h, 4.25rem); z-index: 10; }
+html.chat-mode .lc-app { height: 100%; min-height: 0; border: 0; border-radius: 0; }
+html.chat-mode .lc-auth { height: 100%; min-height: 0; }
+
+/* ---------- sidebar tabs + friends ---------- */
+.lc-tabs { display:flex; gap:.3rem; padding:.55rem .6rem; border-bottom:1px solid var(--line); }
+.lc-tab { flex:1; display:flex; align-items:center; justify-content:center; gap:.4rem; height:32px; border:0; border-radius:8px;
+  background:none; color:var(--dim); font-size:.82rem; font-weight:600; }
+.lc-tab:hover { background:rgba(255,255,255,.04); color:var(--text); }
+.lc-tab.active { background:rgba(125,255,138,.09); color:#fff; }
+.lc-tab .badge { min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:var(--danger); color:#fff;
+  font-size:.68rem; font-weight:700; display:grid; place-items:center; }
+.lc-tab .dot { width:7px; height:7px; border-radius:50%; background:var(--accent); }
+.lc-fadd { padding:.7rem .7rem .3rem; }
+.lc-fadd-row { display:flex; gap:.4rem; }
+.lc-fadd input { flex:1; min-width:0; height:34px; padding:0 .7rem; border-radius:8px; background:rgba(255,255,255,.035);
+  border:1px solid var(--line); outline:0; font-size:.82rem; transition:border-color .15s; }
+.lc-fadd input:focus { border-color:rgba(125,255,138,.55); }
+.lc-fadd input::placeholder { color:#5d616b; }
+.lc-fmsg { margin-top:.5rem; font-size:.75rem; line-height:1.35; color:var(--accent); }
+.lc-fmsg.err { color:#ffb3be; }
+.lc-frow { display:flex; align-items:center; gap:.2rem; margin:1px .4rem; padding:.15rem .3rem .15rem .5rem; border-radius:8px; }
+.lc-frow:hover { background:rgba(255,255,255,.04); }
+.lc-frow.off .lc-fwho { opacity:.6; }
+.lc-fwho { flex:1; min-width:0; display:flex; align-items:center; gap:.6rem; padding:.2rem 0; background:none; border:0; text-align:left; }
+.lc-fwho .nm { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.88rem; font-weight:600; }
+.lc-frow .lc-iconbtn.ok { color:var(--accent); }
+.lc-frow .lc-iconbtn.ok:hover { background:rgba(125,255,138,.12); }
+.lc-frow .lc-iconbtn.no:hover { color:var(--danger); background:rgba(255,107,129,.1); }
+.lc-fempty { padding:.6rem 1rem; font-size:.8rem; line-height:1.45; color:#5d616b; }
+.lc-card .row { flex-wrap:wrap; }
+
+/* ---------- role groups + owner role picker ---------- */
+.lc-mhead.owner { color:#ffd27e; }
+.lc-mhead.admin { color:#ff7eb6; }
+.lc-mhead.mod { color:var(--cyan); }
+.lc-badge { margin-left:auto; flex-shrink:0; }
+.lc-meta .lc-badge, .lc-card h3 .lc-badge { margin-left:0; }
+.lc-rolepick { margin-top:.9rem; }
+.lc-rolepick .lbl { font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:#5d616b; font-weight:600; margin-bottom:.4rem; }
+.lc-rolepick .opts { display:flex; gap:.35rem; }
+.lc-rolepick button { flex:1; height:32px; border-radius:8px; border:1px solid var(--line); background:rgba(255,255,255,.035);
+  color:var(--dim); font-size:.78rem; font-weight:600; transition:background .15s,color .15s,border-color .15s; }
+.lc-rolepick button:hover { color:#fff; background:rgba(255,255,255,.07); }
+.lc-rolepick button.sel { color:#fff; cursor:default; }
+.lc-rolepick button.member.sel { background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.25); }
+.lc-rolepick button.mod.sel { background:rgba(126,232,255,.15); border-color:rgba(126,232,255,.5); color:var(--cyan); }
+.lc-rolepick button.admin.sel { background:rgba(255,126,182,.15); border-color:rgba(255,126,182,.5); color:#ff7eb6; }
+
+/* ---------- Member role ---------- */
+.lc-badge.member { background:rgba(255,255,255,.08); color:#a1a1aa; }
+.lc-mhead.member { color:#8b8f99; }
+
+/* ---------- direct messages ---------- */
+.lc-frow.active { background:rgba(125,255,138,.09); }
+.lc-fwho .lc-unread { margin-left:auto; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:var(--danger); color:#fff;
+  font-size:.68rem; font-weight:700; display:grid; place-items:center; flex-shrink:0; }
+
+/* ---------- profile picture & banner editing ---------- */
+.lc-imgctl { display:flex; flex-direction:column; gap:.45rem; margin-top:.8rem; }
+.lc-imgrow { display:flex; align-items:center; gap:.4rem; }
+.lc-imgrow .lbl { flex:1; font-size:.8rem; color:var(--dim); }
+.lc-imgrow button { height:30px; padding:0 .75rem; border:0; border-radius:8px; background:rgba(255,255,255,.07); color:var(--text); font-size:.78rem; }
+.lc-imgrow button:hover { background:rgba(255,255,255,.13); }
+.lc-imgrow button.danger:hover { color:var(--danger); background:rgba(255,107,129,.1); }
+.lc-imgnote { font-size:.7rem; color:#5d616b; line-height:1.35; }
+.lc-imgerr { font-size:.78rem; color:#ffd0d6; background:rgba(255,107,129,.12); padding:.4rem .6rem; border-radius:8px; }
+.lc-imgerr[hidden] { display:none; }
+
+/* ---- staff controls on profile cards ---- */
+.lc-mhead.banned { color:var(--danger); }
+.lc-mod { margin-top:.9rem; padding-top:.8rem; border-top:1px solid var(--line); }
+.lc-mod .lbl { font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:#5d616b; font-weight:600; margin-bottom:.45rem; }
+.lc-modrow { display:flex; gap:.4rem; margin-bottom:.4rem; flex-wrap:wrap; }
+.lc-modrow .lc-btn.small { flex:1 1 auto; min-width:0; }
+.lc-btn.small.danger { background:rgba(255,107,129,.12); color:var(--danger); border:1px solid rgba(255,107,129,.3); }
+.lc-btn.small.danger:hover { background:rgba(255,107,129,.2); }
+.lc-btn.small:disabled { opacity:.4; cursor:default; }

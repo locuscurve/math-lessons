@@ -1,0 +1,92 @@
+/* Bookmarks (quick apps) — plain CSS, no Tailwind rebuild needed. */
+.bm { display: flex; flex-direction: column; width: 100%; margin-top: 1rem; text-align: left; }
+.bm[hidden] { display: none; }
+
+/* The Edit button sits under the tiles so the tiles start right below the search bar. */
+.bm-bar { order: 2; display: flex; justify-content: flex-end; min-height: 1.75rem; margin-top: 0.35rem; }
+.bm-toggle {
+  border: 0; border-radius: 0.5rem; padding: 0.25rem 0.7rem; cursor: pointer;
+  background: transparent; color: #71717a; font: 500 12px Inter, system-ui, sans-serif;
+  letter-spacing: 0.03em; transition: color .15s, background .15s;
+}
+.bm-toggle:hover { color: #e4e4e7; background: rgba(255, 255, 255, 0.06); }
+.bm-count { display: none; margin-right: auto; align-self: center; color: #71717a; font: 500 12px Inter, system-ui, sans-serif; letter-spacing: 0.03em; }
+.bm[data-editing="true"] .bm-count { display: block; }
+.bm[data-editing="true"] .bm-toggle { color: #7dff8a; background: rgba(125, 255, 138, 0.1); }
+
+/* Six across on desktop, rows fill left to right, last row stays left-aligned. */
+.bm-grid { order: 1; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.5rem; }
+@media (max-width: 560px) { .bm-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.bm-tile {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  gap: 0.4rem; height: 5.6rem; padding: 0.8rem 0.25rem 0.5rem; box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; cursor: pointer;
+  background: rgba(12, 14, 18, 0.72);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.35);
+  color: #d4d4d8; font: 500 0.7rem/1.2 Inter, system-ui, sans-serif; text-align: center;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.bm-tile:hover { background: rgba(22, 26, 34, 0.88); border-color: rgba(125, 255, 138, 0.35); color: #fff; }
+.bm-tile:focus-visible { outline: 2px solid #7dff8a; outline-offset: 2px; }
+
+.bm-icon { width: 2rem; height: 2rem; border-radius: 0.5rem; object-fit: contain; flex-shrink: 0; }
+.bm-glyph {
+  display: flex; align-items: center; justify-content: center; width: 2rem; height: 2rem;
+  border-radius: 0.5rem; border: 1px solid rgba(125, 255, 138, 0.25); background: rgba(125, 255, 138, 0.1);
+  color: #7dff8a; font: 600 13px Orbitron, Inter, system-ui, sans-serif; flex-shrink: 0;
+}
+.bm-name { display: block; width: 100%; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+/* Edit mode: tiles stop launching and show the pencil + remove buttons. */
+.bm-tools { position: absolute; top: -0.4rem; right: -0.4rem; display: none; gap: 0.25rem; z-index: 2; }
+.bm[data-editing="true"] .bm-tools { display: flex; }
+.bm-tool {
+  width: 1.55rem; height: 1.55rem; padding: 0; border-radius: 999px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.14); background: #0b0d10; color: #e4e4e7;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.bm-tool svg { width: 0.8rem; height: 0.8rem; }
+.bm-tool:hover { background: #1a2028; border-color: rgba(125, 255, 138, 0.5); color: #7dff8a; }
+.bm-tool[data-act="remove"]:hover { color: #ff8a8a; border-color: rgba(255, 138, 138, 0.5); }
+
+.bm-add {
+  display: none; align-items: center; justify-content: center; height: 5.6rem; cursor: pointer;
+  border: 1px dashed rgba(255, 255, 255, 0.18); border-radius: 1rem; background: transparent;
+  color: #a1a1aa; font: 500 12px Inter, system-ui, sans-serif; transition: color .15s, border-color .15s;
+}
+.bm[data-editing="true"] .bm-add { display: flex; }
+.bm-add:hover { color: #7dff8a; border-color: rgba(125, 255, 138, 0.5); }
+
+.bm-empty { grid-column: 1 / -1; color: #71717a; font: 13px Inter, system-ui, sans-serif; padding: 0.5rem 0; }
+
+/* Inline editor panel */
+.bm-form {
+  order: 3; margin-top: 1rem; padding: 1rem; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem;
+  background: rgba(12, 14, 18, 0.85); display: grid; gap: 0.7rem;
+}
+.bm-form[hidden] { display: none; }
+.bm-field { display: grid; grid-template-columns: 5.5rem 1fr; align-items: center; gap: 0.75rem; }
+.bm-field label { color: #a1a1aa; font: 13px Inter, system-ui, sans-serif; }
+.bm-field input {
+  width: 100%; height: 2.5rem; padding: 0 0.8rem; border-radius: 0.6rem; box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(0, 0, 0, 0.45); color: #e4e4e7;
+  font: 14px Inter, system-ui, sans-serif;
+}
+.bm-field input:focus { outline: none; border-color: rgba(125, 255, 138, 0.55); }
+.bm-hint { grid-column: 2; color: #71717a; font: 11px Inter, system-ui, sans-serif; }
+.bm-error { color: #ff9a9a; font: 12px Inter, system-ui, sans-serif; min-height: 1rem; text-align: right; }
+.bm-actions { display: flex; justify-content: flex-end; align-items: center; gap: 0.6rem; }
+.bm-btn {
+  height: 2.2rem; padding: 0 1rem; border-radius: 0.6rem; cursor: pointer; border: 0;
+  font: 600 13px Inter, system-ui, sans-serif; transition: filter .15s, background .15s;
+}
+.bm-btn.ghost { background: transparent; color: #a1a1aa; }
+.bm-btn.ghost:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
+.bm-btn.primary { background: #7dff8a; color: #06210b; }
+.bm-btn.primary:hover { filter: brightness(1.1); }
+.bm-reset { margin-right: auto; color: #71717a; background: transparent; }
+.bm-reset:hover { color: #ff9a9a; background: rgba(255, 138, 138, 0.08); }
+@media (max-width: 480px) { .bm-field { grid-template-columns: 1fr; gap: 0.3rem; } .bm-hint { grid-column: 1; } }
+@media (prefers-reduced-motion: reduce) { .bm * { transition: none !important; } }

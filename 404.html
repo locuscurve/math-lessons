@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#00150f" />
+    <title>Lemniscate | Page Not Found</title>
+    <base href="/" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700&display=swap"
+      rel="stylesheet"
+      crossorigin
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        overflow: hidden;
+        background: #00150f;
+        font-family: Orbitron, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .page {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 100svh;
+        display: grid;
+        place-items: center;
+        isolation: isolate;
+        overflow: hidden;
+      }
+
+      .background {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
+        z-index: -3;
+      }
+
+      .shade {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at center,
+          rgba(0, 0, 0, 0.04) 0%,
+          rgba(0, 12, 8, 0.18) 52%,
+          rgba(0, 8, 5, 0.34) 100%
+        );
+        z-index: -2;
+      }
+
+      .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        width: min(90vw, 720px);
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .logo {
+        display: block;
+        width: min(34vw, 220px);
+        max-width: 100%;
+        height: auto;
+        filter: drop-shadow(0 0 26px rgba(92, 255, 111, 0.28));
+      }
+
+      .home-link {
+        color: #86ff93;
+        font-family: Orbitron, system-ui, sans-serif;
+        font-size: clamp(0.85rem, 1.5vw, 1rem);
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-decoration: none;
+        text-transform: uppercase;
+        transition: opacity 0.18s ease, transform 0.18s ease, text-shadow 0.18s ease;
+      }
+
+      .home-link:hover,
+      .home-link:focus-visible {
+        opacity: 0.95;
+        transform: translateY(-1px);
+        text-shadow: 0 0 14px rgba(111, 255, 127, 0.65);
+        outline: none;
+      }
+
+      .home-link::after {
+        content: "";
+        display: block;
+        width: 100%;
+        height: 1px;
+        margin-top: 0.45rem;
+        background: currentColor;
+        transform: scaleX(0.25);
+        transform-origin: center;
+        opacity: 0.65;
+        transition: transform 0.18s ease;
+      }
+
+      .home-link:hover::after,
+      .home-link:focus-visible::after {
+        transform: scaleX(1);
+      }
+
+      @media (max-width: 640px) {
+        .content {
+          gap: 1.5rem;
+          padding: 1.5rem;
+        }
+
+        .logo {
+          width: min(48vw, 180px);
+        }
+      }
+    </style>
+    <script src="/analytics.js"></script>
+  </head>
+
+  <body>
+    <main class="page">
+      <img
+        class="background"
+        src="images/404-background.jpg"
+        alt=""
+        aria-hidden="true"
+      />
+
+      <div class="shade" aria-hidden="true"></div>
+
+      <div class="content">
+        <img
+          class="logo"
+          src="images/404-logo.png"
+          alt="Lemniscate"
+        />
+
+        <a class="home-link" href="/">
+          TAKE ME HOME
+        </a>
+      </div>
+    </main>
+  </body>
+</html>

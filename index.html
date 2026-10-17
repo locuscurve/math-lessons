@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lemniscate</title>
+    <!-- Scramjet + BareMux + proxy.js are loaded on demand by js/proxy-loader.js -->
+    <link rel="stylesheet" href="/css/tailwind.css" />
+    <link rel="stylesheet" href="css/bookmarks.css" />
+    <link rel="stylesheet" href="css/chat.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+    <link rel="stylesheet" href="css/game-player.css?v=4" />
+    <link rel="stylesheet" href="css/games-page.css?v=4" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+      crossorigin
+    />
+    <style>
+      html { color-scheme: dark; }
+      body {
+        font-family: Inter, system-ui, sans-serif;
+        min-height: 100vh;
+        background:
+          linear-gradient(rgba(125, 255, 138,0.045) 1px, transparent 1px) 0 var(--grid-y, 0px) / 48px 48px fixed,
+          linear-gradient(90deg, rgba(125, 255, 138,0.045) 1px, transparent 1px) 0 var(--grid-y, 0px) / 48px 48px fixed,
+          radial-gradient(ellipse at 50% 20%, #0d1b22 0%, #050607 70%) fixed;
+      }
+      h1, h2, h3, .font-display, .nav-btn { font-family: Orbitron, system-ui, sans-serif; }
+      .logo { width: min(15rem, 60vw); height: auto; filter: drop-shadow(0 0 18px rgba(125,255,138,0.4)); }
+      .glass-tile {
+        background: rgba(12, 14, 18, 0.72);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.35);
+        transition: background .15s, border-color .15s;
+      }
+      .glass-tile:hover { background: rgba(22, 26, 34, 0.88); border-color: rgba(125, 255, 138,0.35); }
+      .thumb-placeholder { background: linear-gradient(135deg, #12151a, #0a0c0e); display: flex; align-items: center; justify-content: center; color: #7dff8a; }
+      .dock {
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0));
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        text-transform: uppercase;
+      }
+      /* ---- Library / Apps header ---- */
+      .hdr {
+        position: sticky; top: 0; z-index: 20;
+        display: flex; align-items: center; gap: 1.25rem;
+        padding: 0.7rem 1.5rem;
+        background: rgba(8, 8, 13, 0.92);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(10px);
+      }
+      .hdr-logo-btn { display: flex; align-items: center; background: none; border: 0; padding: 0; cursor: pointer; flex-shrink: 0; }
+      .hdr-logo { height: 34px; width: auto; filter: drop-shadow(0 0 10px rgba(125, 255, 138, 0.35)); }
+      .hdr-search-slot { flex: 1; min-width: 0; }
+      .hdr.hdr-plain .hdr-search-slot, .hdr.hdr-plain .hdr-close { display: none; }
+      .hdr.hdr-plain { display: none; }
+      /* the shared search box, when it lives in the header */
+      .search-label { position: relative; display: block; }
+      .hdr-search-slot .search-label > svg {
+        position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+        width: 16px; height: 16px; color: #71717a; pointer-events: none;
+      }
+      .hdr-search-slot #search {
+        width: 100%; height: 52px; border-radius: 12px; padding: 0 9.5rem 0 2.75rem;
+        background: rgba(255, 255, 255, 0.035); border: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 15px; letter-spacing: 0; color: #e4e4e7;
+      }
+      .hdr-search-slot #search:focus { border-color: rgba(255, 255, 255, 0.2); }
+      .hdr-search-slot .search-count {
+        position: absolute; right: 1.1rem; top: 50%; transform: translateY(-50%);
+        display: flex; align-items: center; gap: 1rem;
+        font-size: 14px; color: #6f717c; pointer-events: none; white-space: nowrap;
+      }
+      .search-count[hidden] { display: none; }
+      .search-count-divider { display: block; width: 1px; height: 18px; background: rgba(255, 255, 255, 0.12); }
+      .hdr-close {
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 40px; height: 40px;
+        background: none; border: 0; border-radius: 10px; color: #7b7d88; cursor: pointer; transition: color .15s, background .15s;
+      }
+      .hdr-close:hover { color: #c4c6ce; background: rgba(255, 255, 255, 0.06); }
+      .hdr-close svg { width: 22px; height: 22px; }
+      @media (max-width: 640px) {
+        .hdr { padding: 0.6rem 0.75rem; gap: 0.6rem; }
+        .hdr-logo { height: 28px; }
+        .hdr-search-slot #search { height: 46px; padding: 0 5rem 0 2.3rem; font-size: 14px; }
+        .hdr-search-slot .search-label > svg { left: 0.8rem; }
+        .hdr-search-slot .search-count { right: 0.7rem; gap: 0.5rem; font-size: 12px; }
+      }
+      #typewriter-caret {
+        display: inline-block;
+        width: 2px;
+        height: 1.1em;
+        margin-left: 2px;
+        background: #7dff8a;
+        box-shadow: 0 0 8px rgba(125,255,138,0.6);
+        animation: caret-blink 1s steps(1) infinite;
+      }
+      #typewriter-text { font-family: Orbitron, system-ui, sans-serif; font-weight: 500; letter-spacing: 0.2em; }
+      #typewriter-caret.typing { animation: none; opacity: 1; }
+      @keyframes caret-blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+      button:focus-visible, input:focus-visible { outline: 2px solid #7dff8a; outline-offset: 2px; }
+      #startup-screen {
+        position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center;
+        background: #000; color: #f4f4f5; font: 20px Arial, Helvetica, sans-serif;
+        opacity: 1; visibility: visible; transition: opacity .35s ease, visibility 0s linear .35s;
+      }
+      #startup-screen.is-leaving { opacity: 0; visibility: hidden; pointer-events: none; }
+      html.motion-reduce #startup-screen { transition: none; }
+      #startup-status { margin: 0; padding: 1rem 1rem .4rem; text-align: center; }
+      #startup-tip { max-width: min(46rem, 90vw); margin: 0 auto; padding: .4rem 1rem 1rem; color: #a1a1aa; font-size: 14px; line-height: 1.5; text-align: center; }
+      @media (max-width: 600px) { #startup-screen { font-size: 16px; } #startup-tip { font-size: 12px; } }
+    </style>
+    <script src="/analytics.js"></script>
+  </head>
+  <body class="font-sans text-zinc-200 antialiased min-h-screen">
+    <div id="startup-screen" role="status" aria-live="polite">
+      <div>
+        <p id="startup-status">Loading Lemniscate...</p>
+        <p id="startup-tip">TIP: If the proxy isn't working, close your browser, reopen the website, and press CTRL+SHIFT+R.</p>
+      </div>
+    </div>
+    <section
+      id="landing"
+      class="relative flex min-h-screen flex-col items-center justify-center px-4 pb-24 pt-10"
+    >
+      <div class="flex w-full max-w-[600px] flex-col items-center text-center">
+        <h1 class="flex justify-center">
+          <img class="logo" src="images/logo.png" alt="Lemniscate" />
+        </h1>
+        <p
+          id="typewriter"
+          class="mt-5 flex min-h-[1.75rem] items-center justify-center text-sm text-zinc-300 sm:min-h-[1.5rem] sm:text-base"
+          aria-label="Infinite Entertainment"
+        >
+          <span id="typewriter-text" aria-hidden="true"></span><span id="typewriter-caret" aria-hidden="true"></span>
+        </p>
+        <div id="search-home-slot" class="mt-12 w-full">
+          <label class="relative block search-label">
+            <span class="sr-only">Search</span>
+            <svg
+              class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="m21 21-4.35-4.35M17 11a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"
+              />
+            </svg>
+            <input
+              id="search"
+              type="search"
+              placeholder="Search the web or enter a URL..."
+              class="w-full rounded-full border border-white/10 bg-black/45 py-3.5 pl-11 pr-4 text-sm tracking-wide text-zinc-200 placeholder:text-zinc-500 focus:border-white/25 focus:outline-none"
+            />
+            <span id="search-count" class="search-count" hidden>
+              <i class="search-count-divider"></i><span id="search-count-text">0 Total</span>
+            </span>
+          </label>
+        </div>
+        <div id="bookmarks"></div>
+        <div
+          id="shortcuts"
+          class="mt-6 grid w-full grid-cols-3 gap-3 sm:grid-cols-6"
+        ></div>
+      </div>
+    </section>
+
+    <div id="workspace" class="hidden min-h-screen flex-col pb-24">
+      <header id="hdr" class="hdr">
+        <button type="button" id="hdr-home" class="hdr-logo-btn" aria-label="Home">
+          <img src="images/logo.png" alt="Lemniscate" class="hdr-logo" />
+        </button>
+        <div id="search-header-slot" class="hdr-search-slot"></div>
+        <button type="button" id="hdr-close" class="hdr-close" aria-label="Back to home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </header>
+      <main id="view" class="flex-1 px-4 py-6 sm:px-6 lg:px-8"></main>
+    </div>
+
+    <nav
+      class="dock fixed inset-x-0 bottom-0 z-30 flex items-end justify-between gap-8 px-6 py-4 sm:px-10"
+      aria-label="Primary"
+    >
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs tracking-wide text-zinc-500" style="font-family: Inter, system-ui, sans-serif">
+        <p>&copy; Lemniscate</p>
+        <p>ping: <span id="ping-val">--</span></p>
+        <p>Version: 1.5</p>
+      </div>
+      <div class="flex items-end gap-8">
+      <button type="button" data-nav="home" class="nav-btn text-sm font-medium tracking-wide text-zinc-300 hover:text-white">
+        Home
+      </button>
+      <button type="button" data-nav="games" class="nav-btn text-sm font-medium tracking-wide text-zinc-300 hover:text-white">
+        Games
+      </button>
+      <button type="button" data-nav="cloud" class="nav-btn text-sm font-medium tracking-wide text-zinc-300 hover:text-white">
+        Chat
+      </button>
+      <button type="button" data-nav="settings" class="nav-btn text-sm font-medium tracking-wide text-zinc-300 hover:text-white">
+        Settings
+      </button>
+      <a
+        href="https://discord.gg/DFzqkwX6vb"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-sm font-medium tracking-wide text-zinc-300 hover:text-white"
+        style="font-family: Orbitron, system-ui, sans-serif; text-transform: none"
+      >
+        Discord
+      </a>
+    </div>
+    </nav>
+
+    <div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/75" data-close-modal></div>
+      <div id="modal-panel" class="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-white/10 bg-lab-900">
+        <div id="modal-bar" class="flex items-center justify-between border-b border-white/10 px-4 py-3">
+          <div class="modal-title-wrap">
+            <img id="modal-icon" class="modal-icon" alt="" hidden />
+            <h3 id="modal-title" class="font-medium tracking-wide text-white">Session</h3>
+          </div>
+          <div class="modal-actions">
+            <button type="button" id="modal-report" class="modal-icon-btn" title="Report a problem" aria-label="Report a problem" hidden>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg>
+            </button>
+            <button type="button" id="modal-fav" class="modal-icon-btn modal-fav-btn" title="Add to favorites" aria-label="Add to favorites" aria-pressed="false" hidden>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l2.94 5.96 6.58.96-4.76 4.64 1.12 6.55L12 17.52l-5.88 3.09 1.12-6.55L2.48 9.42l6.58-.96L12 2.5z"/></svg>
+            </button>
+            <button type="button" id="modal-fs" class="modal-icon-btn" title="Fullscreen" aria-label="Fullscreen" hidden>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>
+            </button>
+            <button type="button" data-close-modal class="modal-icon-btn" title="Close" aria-label="Close">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="modal-body" class="min-h-[320px] overflow-auto bg-black/60 p-4"></div>
+      </div>
+
+      <div id="report-dialog" class="report-overlay" hidden>
+        <div class="report-backdrop" data-close-report></div>
+        <div class="report-card" role="dialog" aria-modal="true" aria-labelledby="report-title">
+          <h4 id="report-title" class="report-title">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7" fill="none"/></svg>
+            Game not working?
+          </h4>
+          <p class="report-text">Sorry about that. Let us know and we'll try to fix it.</p>
+          <p class="report-game">Tell us it's <strong id="report-game-name">this game</strong>.</p>
+          <a id="report-discord" class="report-discord" href="https://discord.gg/DFzqkwX6vb" target="_blank" rel="noopener noreferrer">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
+            Report on Discord server
+          </a>
+          <button type="button" class="report-cancel" data-close-report>Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="register-sw.js"></script>
+    <script src="search.js"></script>
+    <script src="js/games-manifest.js?v=5"></script>
+    <script src="js/games.js?v=5"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/app.js?v=11"></script>
+    <script src="js/game-fit.js"></script>
+    <script src="js/tab-title.js"></script>
+    <script src="js/typewriter.js"></script>
+    <script src="js/about-blank.js"></script>
+    <script src="js/proxy-loader.js"></script>
+    <script src="js/bookmarks.js"></script>
+  
+    <script>
+      (() => {
+        const pingEl = document.getElementById("ping-val");
+        const measure = async () => {
+          if (location.protocol === "file:") { pingEl.textContent = "n/a"; return; }
+          if (document.hidden || document.documentElement.classList.contains("game-open")) return;
+          try {
+            const t = performance.now();
+            await fetch(location.pathname + "?ping=" + Date.now(), { method: "HEAD", cache: "no-store" });
+            pingEl.textContent = Math.round(performance.now() - t) + "ms";
+          } catch { pingEl.textContent = "offline"; }
+        };
+        measure();
+        setInterval(measure, 15000);
+      })();
+    </script>
+    <script>
+      (() => {
+        const screen = document.getElementById("startup-screen");
+        const status = document.getElementById("startup-status");
+        if (!screen || !status) return;
+        const started = performance.now();
+        let completed = false;
+        const stage = setTimeout(() => {
+          if (!completed) status.textContent = "Initializing Lemniscate...";
+        }, 180);
+        const finish = () => {
+          if (completed) return;
+          completed = true;
+          clearTimeout(stage);
+          status.textContent = "Lemniscate ready";
+          const remaining = Math.max(0, 2200 - (performance.now() - started));
+          setTimeout(() => {
+            screen.classList.add("is-leaving");
+            setTimeout(() => screen.remove(), 400);
+          }, remaining);
+        };
+        window.addEventListener("load", finish, { once: true });
+        setTimeout(finish, 12000);
+      })();
+    </script>
+  </body>
+</html>

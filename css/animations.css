@@ -1,0 +1,84 @@
+/*
+ * Lemniscate animations.
+ *
+ * On by default. Settings > Appearance > "Reduce Motion/Animations" puts the
+ * `motion-reduce` class on <html>, and every rule that animates something below
+ * is scoped to `html:not(.motion-reduce)`, so turning that setting on switches
+ * all of them off at once. js/*.js also checks the same class before it delays
+ * removing an element to let a closing animation play.
+ */
+
+@keyframes lv-fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lv-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes lv-pop-in   { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes lv-pop-out  { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(6px) scale(.97); } }
+@keyframes lv-sec-in   { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes lv-slide-in-left { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
+@keyframes lv-window-in { from { opacity: .6; transform: translateY(100vh); } to { opacity: 1; transform: translateY(0); } }
+@keyframes lv-window-out { from { opacity: 1; transform: translateY(0); } to { opacity: 1; transform: translateY(100vh); } }
+@keyframes lv-window-close-top { from { opacity: 1; transform: translateY(0); } to { opacity: .7; transform: translateY(100vh); } }
+@keyframes lv-home-arrive { from { opacity: 0; transform: translateY(18px) scale(.985); filter: blur(5px); } to { opacity: 1; transform: none; filter: blur(0); } }
+/* The error toast is centered with translateX(-50%), so the keyframes keep that. */
+@keyframes lv-toast-in { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+/* ---- Switching between Home / Games / Chat / Settings: cross-fade ---- */
+html:not(.motion-reduce)::view-transition-group(root) { animation-duration: .3s; }
+html:not(.motion-reduce)::view-transition-old(root),
+html:not(.motion-reduce)::view-transition-new(root) { animation-duration: .3s; animation-timing-function: ease; }
+
+/* Fallback for browsers without the View Transitions API: fade the incoming view in. */
+html:not(.motion-reduce) .lv-view-in { animation: lv-fade-in .3s ease backwards; }
+html:not(.motion-reduce).games-mode .lv-view-in { animation: lv-window-in .42s cubic-bezier(.18, .78, .22, 1) backwards; }
+html:not(.motion-reduce) #workspace.lv-view-out { animation: lv-window-out .32s cubic-bezier(.65, 0, .85, .35) forwards; pointer-events: none; }
+
+/* ---- Settings: each section eases in when you pick it in the sidebar ---- */
+html:not(.motion-reduce) .lv-sec-in { animation: lv-sec-in .2s ease backwards; }
+
+/* ---- Game / app window (#modal) ---- */
+html:not(.motion-reduce) #modal.lv-open > .absolute { animation: lv-fade-in .2s ease backwards; }
+html:not(.motion-reduce) #modal.lv-open > .relative { animation: lv-window-in .42s cubic-bezier(.18, .78, .22, 1) backwards; }
+html:not(.motion-reduce) #modal.lv-closing > .absolute { animation: lv-fade-out .16s ease forwards; }
+html:not(.motion-reduce) #modal.lv-closing > .relative { animation: lv-window-close-top .32s cubic-bezier(.65, 0, .85, .35) forwards; }
+html:not(.motion-reduce) #modal.lv-closing { pointer-events: none; }
+
+/* ---- Chat profile card ---- */
+html:not(.motion-reduce) .lc-overlay { animation: lv-fade-in .18s ease backwards; }
+html:not(.motion-reduce) .lc-overlay > .lc-card { animation: lv-pop-in .24s cubic-bezier(.2, .8, .2, 1) backwards; }
+/* Re-drawing a card that is already open (after adding a friend, changing a role...) should not replay the entrance. */
+html:not(.motion-reduce) .lc-overlay.lv-still,
+html:not(.motion-reduce) .lc-overlay.lv-still > .lc-card { animation: none; }
+html:not(.motion-reduce) .lc-overlay.lv-closing { animation: lv-fade-out .16s ease forwards; pointer-events: none; }
+html:not(.motion-reduce) .lc-overlay.lv-closing > .lc-card { animation: lv-pop-out .16s ease forwards; }
+
+/* ---- Chat channel list on phones ---- */
+html:not(.motion-reduce) .lc-app.show-side .lc-side { animation: lv-slide-in-left .22s ease backwards; }
+
+/* ---- Web page viewer (opened from the search bar) ---- */
+html:not(.motion-reduce) .lv-viewer { animation: lv-window-in .42s cubic-bezier(.18, .78, .22, 1) backwards; }
+html:not(.motion-reduce) .lv-viewer.lv-closing { animation: lv-window-close-top .32s cubic-bezier(.65, 0, .85, .35) forwards; pointer-events: none; }
+
+/* ---- Error toast ---- */
+html:not(.motion-reduce) .lv-toast { animation: lv-toast-in .22s ease backwards; }
+
+/* ---- Bookmark add/edit form ---- */
+html:not(.motion-reduce) .bm-form:not([hidden]) { animation: lv-sec-in .2s ease backwards; }
+
+/* ---- Home intro and shortcut hover ---- */
+html:not(.motion-reduce) #landing > div { animation: lv-home-arrive .75s cubic-bezier(.2, .7, .2, 1) both; }
+html:not(.motion-reduce) #shortcuts > * { animation: lv-sec-in .48s cubic-bezier(.2, .7, .2, 1) both; }
+html:not(.motion-reduce) #shortcuts > *:nth-child(1) { animation-delay: .18s; }
+html:not(.motion-reduce) #shortcuts > *:nth-child(2) { animation-delay: .24s; }
+html:not(.motion-reduce) #shortcuts > *:nth-child(3) { animation-delay: .30s; }
+html:not(.motion-reduce) #shortcuts > *:nth-child(4) { animation-delay: .36s; }
+html:not(.motion-reduce) #shortcuts > *:nth-child(5) { animation-delay: .42s; }
+html:not(.motion-reduce) #shortcuts > *:nth-child(6) { animation-delay: .48s; }
+
+/* ---- Tiles: lift on hover, press on click ---- */
+html:not(.motion-reduce) .glass-tile,
+html:not(.motion-reduce) .bm-tile {
+  transition: background .2s ease, border-color .2s ease, color .2s ease, transform .24s cubic-bezier(.2, .8, .2, 1), box-shadow .24s ease;
+}
+html:not(.motion-reduce) .glass-tile:hover,
+html:not(.motion-reduce) .bm:not([data-editing="true"]) .bm-tile:hover { transform: translateY(-5px) scale(1.025); box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 14px 34px rgba(0,0,0,.42), 0 0 24px rgba(125,255,138,.12); }
+html:not(.motion-reduce) .glass-tile:active,
+html:not(.motion-reduce) .bm:not([data-editing="true"]) .bm-tile:active { transform: translateY(-1px) scale(.97); }
